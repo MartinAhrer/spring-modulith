@@ -15,7 +15,6 @@
  */
 package org.springframework.modulith.events.support;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -30,11 +29,11 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.PayloadApplicationEvent;
 import org.springframework.context.event.AbstractApplicationEventMulticaster;
 import org.springframework.context.event.ApplicationEventMulticaster;
-import org.springframework.context.event.ApplicationListenerMethodAdapter;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
+import org.springframework.modulith.events.ConditionalEventListener;
 import org.springframework.modulith.events.EventPublication;
 import org.springframework.modulith.events.EventPublicationRegistry;
 import org.springframework.modulith.events.PublicationTargetIdentifier;
@@ -113,6 +112,22 @@ public class PersistentApplicationEventMulticaster extends AbstractApplicationEv
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.springframework.context.event.AbstractApplicationEventMulticaster#getApplicationListeners(org.springframework.context.ApplicationEvent, org.springframework.core.ResolvableType)
+	 */
+	@Override
+	protected Collection<ApplicationListener<?>> getApplicationListeners(ApplicationEvent event,
+			ResolvableType eventType) {
+
+		Object eventToPersist = getEventToPersist(event);
+
+		return super.getApplicationListeners(event, eventType)
+				.stream()
+				.filter(it -> matches(eventToPersist, it))
+				.toList();
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.beans.factory.SmartInitializingSingleton#afterSingletonsInstantiated()
 	 */
 	@Override
@@ -169,6 +184,13 @@ public class PersistentApplicationEventMulticaster extends AbstractApplicationEv
 		return PayloadApplicationEvent.class.isInstance(event) //
 				? ((PayloadApplicationEvent<?>) event).getPayload() //
 				: event;
+	}
+
+	private static boolean matches(Object event, ApplicationListener<?> listener) {
+
+		return ConditionalEventListener.class.isInstance(listener)
+				? ConditionalEventListener.class.cast(listener).supports(event)
+				: true;
 	}
 
 	/**

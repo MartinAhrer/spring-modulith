@@ -53,7 +53,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @Configuration(proxyBeanMethods = false)
 @Import(AsyncEnablingConfiguration.class)
-class EventPublicationConfiguration {
+public class EventPublicationConfiguration {
 
 	@Bean
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
