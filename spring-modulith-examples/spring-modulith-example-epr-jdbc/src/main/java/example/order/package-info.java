@@ -4,5 +4,11 @@
  *
  * @see example.ModularityTests
  */
-@org.springframework.lang.NonNullApi
+@NonNullApi
+// WORKSHOP:
+// <3> only allow access to the catalog
+//@ApplicationModule(allowedDependencies = "catalog::spi")
 package example.order;
+
+import org.springframework.lang.NonNullApi;
+import org.springframework.modulith.ApplicationModule;

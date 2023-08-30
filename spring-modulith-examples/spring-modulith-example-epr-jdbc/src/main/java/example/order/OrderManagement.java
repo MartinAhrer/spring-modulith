@@ -15,6 +15,8 @@
  */
 package example.order;
 
+import example.catalog.spi.CatalogSpiInterface;
+import example.inventory.InventoryManagementPublic;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -31,8 +33,19 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OrderManagement {
 
-	private final @NonNull ApplicationEventPublisher events;
+	// WORKSHOP:
+	// <1> add this reference to the catalog module
+	// is prohibited without declaring as NamedInterface
+	// <2> to allow this reference
+	//private final @NonNull CatalogSpiInterface catalog;
 
+	// WORKSHOP:
+	// <3> adding this creates a circular reference
+	// info: references a public class that the compiler would allow
+	//private final @NonNull InventoryManagementPublic inventory;
+
+	private final @NonNull ApplicationEventPublisher events;
+	
 	@Transactional
 	public void complete() {
 		events.publishEvent(new OrderCompleted(UUID.randomUUID()));
