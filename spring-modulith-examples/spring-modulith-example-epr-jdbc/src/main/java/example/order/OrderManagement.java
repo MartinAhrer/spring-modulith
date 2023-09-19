@@ -41,11 +41,12 @@ public class OrderManagement {
 
 	// WORKSHOP:
 	// <3> adding this creates a circular reference
+    // because the inventory module has a reference to the order module
 	// info: references a public class that the compiler would allow
 	//private final @NonNull InventoryManagementPublic inventory;
 
 	private final @NonNull ApplicationEventPublisher events;
-	
+
 	@Transactional
 	public void complete() {
 		events.publishEvent(new OrderCompleted(UUID.randomUUID()));
